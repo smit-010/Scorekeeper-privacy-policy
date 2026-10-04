@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Score Keeper — cricket scorer for gully and box cricket</title>
+<meta name="description" content="Score Keeper logs every run, over and wicket for gully and turf/box cricket, works offline, and shares the live score with one code.">
+<meta property="og:title" content="Score Keeper — cricket scorer for gully and box cricket">
+<meta property="og:description" content="Log every ball, share the live score with one code, no sign-up.">
+<meta property="og:image" content="img/scoring.jpg">
+<meta name="theme-color" content="#0B0E0C">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B0E0C; --surface: #161B18; --line: #262C28;
+    --text: #FFFFFF; --muted: #A9B1AB; --lime: #CFF53E; --ink: #121513;
+    --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+    --body: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: var(--lime); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  header { padding: 18px 0; border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+  .brand img { width: 40px; height: 40px; border-radius: 10px; }
+  .brand span { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: .06em; text-transform: uppercase; }
+  header nav a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 15px; }
+  header nav a:hover, header nav a:focus-visible { color: var(--lime); }
+
+  .hero { padding: 56px 0 40px; text-align: center; }
+  .pill { display: inline-block; padding: 6px 16px; border-radius: 100px; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--lime); background: rgba(207,245,62,.12); border: 1px solid rgba(207,245,62,.3); }
+  h1 { font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: 1; letter-spacing: -.01em;
+    font-size: clamp(44px, 9vw, 84px); margin: 20px 0 16px; }
+  h1 em { font-style: normal; color: var(--lime); }
+  .lead { max-width: 560px; margin: 0 auto 28px; color: var(--muted); font-size: clamp(17px, 2.4vw, 20px); }
+  .btn { display: inline-block; background: var(--lime); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 17px;
+    padding: 15px 28px; border-radius: 16px; min-height: 48px; }
+  .btn:hover, .btn:focus-visible { filter: brightness(1.06); }
+  .note { margin-top: 12px; color: var(--muted); font-size: 14px; }
+
+  .shots { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 8px 20px 28px; margin-top: 8px; }
+  .shots img { flex: 0 0 auto; width: min(64vw, 270px); height: auto; border-radius: 18px; scroll-snap-align: center; border: 1px solid var(--line); }
+  @media (min-width: 1000px) { .shots { justify-content: center; overflow: visible; } .shots img { width: 180px; } }
+
+  section { padding: 44px 0; }
+  h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: clamp(30px, 5vw, 44px); line-height: 1.05; margin-bottom: 8px; }
+  .sub { color: var(--muted); margin-bottom: 24px; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
+  .card h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: 24px; letter-spacing: .02em; margin-bottom: 6px; color: var(--lime); }
+  .card p { color: var(--muted); font-size: 16px; }
+
+  #privacy { border-top: 1px solid var(--line); }
+  #privacy h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: 24px; margin: 28px 0 8px; }
+  #privacy ul { padding-left: 22px; color: var(--muted); }
+  #privacy li { margin-bottom: 8px; }
+  #privacy p { color: var(--muted); }
+  .updated { color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; text-align: center; }
+  :focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="img/icon.png" alt="" width="40" height="40"><span>Score Keeper</span></a>
+    <nav><a href="#privacy">Privacy policy</a></nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <span class="pill">Gully &amp; box cricket</span>
+    <h1>Stop counting<br><em>in your head.</em></h1>
+    <p class="lead">Log every run, over and wicket. Share the live score with one code. Works with no signal, and needs no account.</p>
+    <a class="btn" href="https://play.google.com/store/apps/details?id=com.timsved.scorekeeper">Get it on Google Play</a>
+    <p class="note">Android</p>
+  </div>
+
+  <div class="shots" aria-label="App screenshots">
+    <img src="img/scoring.jpg" alt="Full match scoring: 27/0 after 1.4 overs with batter and bowler figures" width="540" height="960" loading="lazy">
+    <img src="img/go-live.jpg" alt="Share live score sheet with a match code and QR code" width="540" height="960" loading="lazy">
+    <img src="img/watch.jpg" alt="Watch live screen with ball-by-ball commentary" width="540" height="960" loading="lazy">
+    <img src="img/full-match.jpg" alt="Choosing openers and the opening bowler for a full match" width="540" height="960" loading="lazy">
+    <img src="img/result.jpg" alt="Winner screen: Titans won by 10 wickets" width="540" height="960" loading="lazy">
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2>Built for the box</h2>
+      <p class="sub">Nobody should have to remember the overs while they are also batting.</p>
+      <div class="grid">
+        <div class="card"><h3>Quick match</h3><p>Just team names and overs. Tap runs, wickets and extras ball by ball.</p></div>
+        <div class="card"><h3>Full match</h3><p>Add players, pick openers and bowlers, and get a full scorecard with batter and bowler figures.</p></div>
+        <div class="card"><h3>Live scores</h3><p>Tap Go live and share a 6-character code or QR. Friends follow every ball from anywhere.</p></div>
+        <div class="card"><h3>Offline first</h3><p>Matches are saved on your phone, so scoring works with no signal on the ground.</p></div>
+        <div class="card"><h3>Stats and overs</h3><p>Run rate, projected score, runs per over, fours, sixes and the final result, worked out for you.</p></div>
+        <div class="card"><h3>Your squad</h3><p>Save your regular players once and reuse them in every match.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <h2>Privacy policy</h2>
+      <p class="updated">Last updated: 4 October 2026</p>
+      <p>Score Keeper is made to keep your data on your phone. Here is exactly what stays there and what leaves it.</p>
+
+      <h3>On this phone</h3>
+      <ul>
+        <li>Matches, players, scores and your settings are saved only on your phone. There is no account.</li>
+        <li>Nothing is uploaded unless you choose to go live with a match.</li>
+        <li>In the app, Settings &rsaquo; Reset data deletes everything saved on your phone.</li>
+      </ul>
+
+      <h3>When you go live</h3>
+      <ul>
+        <li>The match, including team names, player names and every ball, is copied to our server (Google Firebase) under its 6-character code, so viewers can follow it.</li>
+        <li>Anyone who has the code can see that match. Codes are random and cannot be listed or searched.</li>
+        <li>Stop sharing ends it for viewers. A live match is deleted automatically 2 days after its last update, or 24 hours after it finishes.</li>
+        <li>Going live signs your phone in anonymously. No name, email or phone number is used.</li>
+      </ul>
+
+      <h3>Usage analytics</h3>
+      <ul>
+        <li>The Android app sends anonymous usage events to Google Analytics for Firebase, for example which screens are opened, match formats and how many matches finish, so we can improve the app.</li>
+        <li>Team names, player names and match codes are never included.</li>
+        <li>Google adds its own anonymous app-instance identifier and basic device information, as described in <a href="https://policies.google.com/privacy">Google's privacy policy</a>.</li>
+      </ul>
+
+      <h3>Notifications</h3>
+      <ul>
+        <li>If you allow notifications, the app uses Firebase Cloud Messaging for match alerts, which involves a device token issued by Google. You can turn notifications off at any time in the app or in your phone's settings.</li>
+      </ul>
+
+      <h3>Contact</h3>
+      <p>Questions about this policy or your data: <a href="mailto:REPLACE-WITH-YOUR-EMAIL@example.com">REPLACE-WITH-YOUR-EMAIL@example.com</a></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">&copy; 2026 Score Keeper &middot; <a href="#privacy">Privacy policy</a></div>
+</footer>
+
+</body>
+</html>
